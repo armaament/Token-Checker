@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"sync"
 	"time"
+	"io/ioutil"
 	"github.com/valyala/fasthttp"
 )
 
@@ -56,14 +57,8 @@ func dumpTokens(tokens []string, filename string) {
 		go func(token string) {
 			defer wg.Done()
 			routines <- struct{}{}
-			file, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND, 0755)
+			err := ioutil.WriteFile("valid.txt", fmt.Sprintf("%s\n", token), 0644)
 			if err != nil {
-				return
-			}
-			defer file.Close()
-
-			_, errs := file.WriteString(fmt.Sprintf("%s\n", token))
-			if errs != nil {
 				return
 			}
 			<-routines
